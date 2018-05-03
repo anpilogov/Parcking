@@ -1,0 +1,41 @@
+﻿<Window x:Class="Plate.Trainer.DirectoryDialogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Plate.Trainer"
+        xmlns:classes="clr-namespace:Plate.Trainer.Model"
+        xmlns:directoryManager="clr-namespace:Plate.Trainer.DirectoryManager"
+        mc:Ignorable="d"
+        Title="Выберите путь к изображениям" Height="300" Width="500">
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="25"></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition Height="30"></RowDefinition>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition></ColumnDefinition>
+			<ColumnDefinition></ColumnDefinition>
+		</Grid.ColumnDefinitions>
+		<TextBox Text="{Binding Path, Mode=TwoWay}" Grid.ColumnSpan="2"></TextBox>
+		<TreeView x:Name="DirectoryTree" Height="300" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" SelectedItemChanged="DirectoryTree_OnSelectedItemChanged">
+			<TreeView.ItemContainerStyle>
+				<Style TargetType="{x:Type TreeViewItem}">
+					<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+					<Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+				</Style>
+			</TreeView.ItemContainerStyle>
+			<TreeView.Resources>
+				<HierarchicalDataTemplate DataType="{x:Type directoryManager:FileSystemObjectInfo}" ItemsSource="{Binding Path=Children}">
+					<StackPanel Orientation="Horizontal">
+						<Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}" Margin="0,1,8,1"></Image>
+						<TextBlock Text="{Binding Path=FileSystemInfo.Name}"></TextBlock>
+					</StackPanel>
+				</HierarchicalDataTemplate>
+			</TreeView.Resources>
+		</TreeView>
+		<Button x:Name="ButtonSave" Grid.Row="2" Grid.Column="0" Click="ButtonSave_OnClick">Сохранить</Button>
+		<Button x:Name="ButtonCancel" Grid.Row="2" Grid.Column="1" Click="ButtonCancel_OnClick">Отмена</Button>
+    </Grid>
+</Window>

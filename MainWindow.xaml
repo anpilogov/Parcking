@@ -1,0 +1,139 @@
+﻿<Window x:Class="Plate.Trainer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Plate.Trainer"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="1400" SizeChanged="MainWindow_OnSizeChanged" Closing="MainWindow_OnClosing" ContentRendered="MainWindow_OnContentRendered">
+	<Window.Resources>
+		<Style TargetType="Button" x:Key="baseButton">
+			<Setter Property="Margin" Value="10"></Setter>
+		</Style>
+		<Style TargetType="Button" BasedOn="{StaticResource baseButton}">
+			<!--<Setter Property="Background" Value="Green"></Setter>-->
+		</Style>
+
+		<Style TargetType="Button" x:Key="CrossButton">
+			<Setter Property="Width" Value="20"></Setter>
+			<Setter Property="Height" Value="20"></Setter>
+			<Setter Property="Margin" Value="7,0,0,0"></Setter>
+		</Style>
+
+		<Style TargetType="Grid">
+			<!--<Setter Property="Background" Value="DimGray"></Setter>-->
+		</Style>
+
+		<Style TargetType="TextBox">
+			<Setter Property="Margin" Value="1"></Setter>
+			<Setter Property="Width" Value="90"></Setter>
+		</Style>
+		<Style TargetType="TextBox" x:Key="FullTextBox">
+			<Setter Property="Margin" Value="1"></Setter>
+			<Setter Property="Width" Value="152"></Setter>
+		</Style>
+	</Window.Resources>
+	<Window.CommandBindings>
+		<CommandBinding Command="{x:Static local:MainWindow.PrevCommand}" Executed="PrevCommandExecuted"/>
+		<CommandBinding Command="{x:Static local:MainWindow.NextCommand}" Executed="NextCommandExecuted"/>
+	</Window.CommandBindings>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="200"></ColumnDefinition>
+			<ColumnDefinition></ColumnDefinition>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="70"></RowDefinition>
+			<RowDefinition ></RowDefinition>
+		</Grid.RowDefinitions>
+		<StackPanel Orientation="Horizontal" Grid.Row ="0" Grid.ColumnSpan="2">
+			<Button Width="50" Click="ButtonFolder_OnClick">
+				<Rectangle Width="30" Height="30" Fill="DimGray" >
+					<Rectangle.OpacityMask>
+						<VisualBrush Stretch="Fill" Visual="{StaticResource folder}" />
+					</Rectangle.OpacityMask>
+				</Rectangle>
+				<Button.ToolTip>Выбрать папку</Button.ToolTip>
+			</Button>
+			<TextBlock x:Name="ZoomText"></TextBlock>
+		</StackPanel>
+		<ListBox x:Name="ThumbnailList" ItemsSource="{Binding Images}" Grid.Row="1" Grid.Column="0">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="100"></RowDefinition>
+							<RowDefinition Height="20"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Image Source="{Binding Annotation.FullName}" Grid.Row="0" Width="150"></Image>
+						<TextBlock Text="{Binding Annotation.FileName}" Grid.Row="1"></TextBlock>
+					</Grid>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+
+		<Grid x:Name="GridMain" Grid.Row="1" Grid.Column="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition></ColumnDefinition>
+				<ColumnDefinition Width="200"></ColumnDefinition>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="40"></RowDefinition>
+				<RowDefinition Height="412*"></RowDefinition>
+				<RowDefinition Height="80"></RowDefinition>
+			</Grid.RowDefinitions>
+			<ScrollViewer x:Name="ScrollViewer" PreviewMouseWheel="ScrollViewer_OnPreviewMouseWheel" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0">
+				<Grid x:Name="GridImage">
+					<Image x:Name="SourceImage" Grid.Column="0" Grid.Row="0" ClipToBounds="True" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+					<Canvas x:Name="Canvas" Grid.Column="0" Grid.Row="0"  ClipToBounds="True" Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+				</Grid>
+			</ScrollViewer>
+			<Button x:Name="AddRegion" Click="AddRegion_OnClick" Grid.Column="1" Grid.Row="0">Добавить область</Button>
+			<ListBox x:Name="RegionsList" ItemsSource="{Binding CurrentItemRegions}" Grid.Column="1" Grid.Row="1" >
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+							</Grid.RowDefinitions>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition></ColumnDefinition>
+								<ColumnDefinition></ColumnDefinition>
+							</Grid.ColumnDefinitions>
+							<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition></ColumnDefinition>
+									<ColumnDefinition Width="30"></ColumnDefinition>
+								</Grid.ColumnDefinitions>
+								<TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FullTextBox}" ></TextBox>
+								<Button Click="RegionItemRemove_OnClick"  Grid.Column="1" Style="{StaticResource CrossButton}">✕</Button>
+							</Grid>
+							<TextBox Text="{Binding StartX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="Region_OnLostFocus" Grid.Row="1" Grid.Column="0"></TextBox>
+							<TextBox Text="{Binding StartY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="Region_OnLostFocus" Grid.Row="1" Grid.Column="1"></TextBox>
+							<TextBox Text="{Binding EndX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="Region_OnLostFocus" Grid.Row="2" Grid.Column="0"></TextBox>
+							<TextBox Text="{Binding EndY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="Region_OnLostFocus" Grid.Row="2" Grid.Column="1"></TextBox>
+							<TextBlock Text="Truncated" Grid.Row="3" Grid.Column="0"></TextBlock>
+							<CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Truncated, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
+							<TextBlock Text="Difficult" Grid.Row="4" Grid.Column="0"></TextBlock>
+							<CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding Difficult, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
+						</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+
+
+			<Grid Grid.Row="3" Grid.Column="0" ColumnSpan="2">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition></ColumnDefinition>
+					<ColumnDefinition></ColumnDefinition>
+				</Grid.ColumnDefinitions>
+				<Button x:Name="ButtonPrevious" Click="ButtonPrevious_OnClick">Предыдущая</Button>
+				<Button x:Name="ButtonNext" Click="ButtonNext_OnClick" Grid.Column="1">Следующая</Button>
+			</Grid>
+		</Grid>
+	</Grid>
+</Window>
